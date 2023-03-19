@@ -7,6 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "tsc scripts/ninja.ts",
+    "dev-ninja": "tsc-watch scripts/ninja.ts"
   },
   "repository": {
     "type": "git",
@@ -27,5 +29,38 @@
   "bugs": {
     "url": "https://github.com/alekart/ninja-cli/issues"
   },
-  "homepage": "https://github.com/alekart/ninja-cli#readme"
+  "homepage": "https://github.com/alekart/ninja-cli#readme",
+  "dependencies": {
+    "@alekart/nunjucks-html-loader": "^1.0.0-alpha.0",
+    "babel-loader": "^9.1.2",
+    "babel-plugin-lodash": "^3.3.4",
+    "css-loader": "^6.7.3",
+    "glob": "^8.1.0",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "image-minimizer-webpack-plugin": "^3.8.2",
+    "imagemin": "^8.0.1",
+    "imagemin-mozjpeg": "^10.0.0",
+    "imagemin-optipng": "^8.0.0",
+    "mini-css-extract-plugin": "^2.7.5",
+    "sass": "^1.59.3",
+    "sass-loader": "^13.2.1",
+    "terser-webpack-plugin": "^5.3.7",
+    "ts-loader": "^9.4.2",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.1",
+    "yargs": "^17.7.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "@types/glob": "^8.1.0",
+    "@types/node": "^18.15.3",
+    "@types/webpack": "^5.28.0",
+    "@types/webpack-dev-server": "^4.7.2",
+    "@types/yargs": "^17.0.22",
+    "typescript": "^4.9.5"
+  },
+  "peerDependencies": {
+    "typescript": "^4.9.5"
+  }
 }
