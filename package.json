@@ -1,6 +1,6 @@
 {
   "name": "ninja-cli",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha",
   "description": "Webpack based static HTML/CSS/JS CLI builder",
   "main": "",
   "directories": {
