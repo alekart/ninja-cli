@@ -7,8 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "tsc scripts/ninja.ts",
-    "dev-ninja": "tsc-watch scripts/ninja.ts"
+    "start": "npm run clean && babel --watch src --out-dir dist --extensions '.ts,.tsx' --watch",
+    "clean" : "rm -rf dist",
+    "build": "npm run clean && babel src --out-dir dist --extensions '.ts,.tsx'"
   },
   "repository": {
     "type": "git",
@@ -52,6 +53,10 @@
     "yargs": "^17.7.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.21.0",
     "@tsconfig/node16": "^1.0.3",
     "@types/glob": "^8.1.0",
     "@types/node": "^18.15.3",
