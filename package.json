@@ -2,9 +2,11 @@
   "name": "ninja-cli",
   "version": "1.0.0-alpha",
   "description": "Webpack based static HTML/CSS/JS CLI builder",
-  "main": "",
   "directories": {
     "doc": "docs"
+  },
+  "bin": {
+    "ninja": "dist/ninja-cli.js"
   },
   "scripts": {
     "start": "npm run clean && babel --watch src --out-dir dist --extensions '.ts,.tsx' --watch",
