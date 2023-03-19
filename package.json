@@ -1,0 +1,31 @@
+{
+  "name": "ninja-cli",
+  "version": "1.0.0",
+  "description": "Webpack based static HTML/CSS/JS CLI builder",
+  "main": "",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alekart/ninja-cli.git"
+  },
+  "keywords": [
+    "html",
+    "cli",
+    "builder",
+    "typescript",
+    "generator",
+    "nunjucks",
+    "scss",
+    "webpack5"
+  ],
+  "author": "alekart",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alekart/ninja-cli/issues"
+  },
+  "homepage": "https://github.com/alekart/ninja-cli#readme"
+}
