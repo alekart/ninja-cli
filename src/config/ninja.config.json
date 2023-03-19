@@ -1,0 +1,77 @@
+{
+  "$schema": "./schema.json",
+  "version": 1,
+  "projects": {
+    "projectName": {
+      "root": "",
+      "sourceRoot": "src",
+      "templatesRoot": "src/templates",
+      "assetsRoot": "src/assets",
+      "dataRoot": "src/data",
+      "i18n": {
+        "sourceLocale": "fr",
+        "outputPath": "src/locales/",
+        "locales": {
+          "en": "src/locale/messages.en-US.xlf"
+        }
+      },
+      "architect": {
+        "build": {
+          "options": {
+            "locale": "fr",
+            "outputPath": "dist/",
+            "index": "src/templates/index.njk",
+            "main": "src/index.ts",
+            "aot": true
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "none",
+              "sourceMap": true,
+              "namedChunks": false
+            },
+            "en": {
+              "localize": [
+                "en"
+              ]
+            },
+            "fr": {
+              "baseHref": "/",
+              "outputPath": "dist/fr"
+            }
+          }
+        },
+        "serve": {
+          "options": {
+            "optimization": false,
+            "port": 4000,
+            "historyApiFallback": {
+              "rewrites": [
+                {
+                  "from": "/^\/$/",
+                  "to": "/views/landing.html"
+                },
+                {
+                  "from": "/^\/subpage/",
+                  "to": "/views/subpage.html"
+                },
+                {
+                  "from": "/./",
+                  "to": "/views/404.html"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "projectName"
+}
