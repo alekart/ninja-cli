@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { extname, relative, resolve } from 'path';
+import { extname, join, relative, resolve } from 'path';
 import { Ninja } from './ninja.class';
 import { NinjaBuildConfiguration } from './interfaces/ninja-configuration.interface';
 import { Configuration } from 'webpack';
@@ -37,7 +37,7 @@ export class WebpackConfigBuilder {
   }
 
   private loadEnv() {
-    let evnFilePath = 'src/environments/environment.ts';
+    let evnFilePath = join(this.ninja.paths.sourceRoot, '/environments/environment.ts');
     const replacement = this.ninja.buildConfiguration?.fileReplacements?.find((r) => r.replace === evnFilePath);
     if (replacement) {
       evnFilePath = replacement.with;
