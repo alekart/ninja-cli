@@ -119,10 +119,10 @@ export class WebpackConfigBuilder {
                 loader: '@alekart/nunjucks-html-loader',
                 options: {
                   templates: this.ninja.paths.templates,
-                  locale: locale || this.ninja.buildConfiguration.localize?.[0] || this.ninja.buildConfiguration.locale,
+                  locale: locale || buildConfig.localize?.[0] || buildConfig.locale,
                   dataPath: this.ninja.paths.data,
                   data: {
-                    locale: locale || this.ninja.buildConfiguration.localize?.[0] || this.ninja.buildConfiguration.locale,
+                    locale: locale || buildConfig.localize?.[0] || buildConfig.locale,
                     ninja: {
                       project: this.ninja.project,
                       configurations: this.ninja.configNames,

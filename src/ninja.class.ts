@@ -1,5 +1,5 @@
-import { resolve } from 'path';
-import { NinjaBuildConfiguration } from './interfaces/ninja-configuration.interface';
+import { join, resolve } from 'path';
+import { NinjaBuildConfiguration, NinjaConfigurationInterface } from './interfaces/ninja-configuration.interface';
 import { runServer } from './server';
 import { WebpackConfigBuilder } from './webpack-config-builder';
 import { Configuration } from 'webpack';
@@ -13,30 +13,26 @@ export class Ninja {
   projectConfig!: Record<string, any>;
   locales: string[];
   configNames: string[];
-  buildConfiguration: NinjaBuildConfiguration;
-  isServer: boolean;
+  buildConfiguration: NinjaBuildConfiguration | undefined;
+  isServer = false;
   paths: { sourceRoot: string, templates: string, data: string, assets: string };
 
-  constructor(public config: Record<string, any>, public project: string, public args: Record<string, any>) {
+  constructor(public config: Record<string, any>, public project: string, public args?: Record<string, any>) {
     this.projectConfig = config.projects[project];
     this.projectRoot = Ninja.ninjaPath(this.projectConfig.root);
     this.locales = this.getLocales();
-    this.configNames = args.configurations;
-    const buildConfig = this.getBuildConfiguration()
-    if(!buildConfig){
-      Ninja.error('No configuration. Aborting.');
-      process.exit(0);
-      return;
-    }
-    this.buildConfiguration = buildConfig;
-    this.isServer = args.server || false;
     this.paths = {
       sourceRoot: Ninja.ninjaPath(this.projectConfig.sourceRoot),
       templates: Ninja.ninjaPath(this.projectConfig.templatesRoot),
       data: Ninja.ninjaPath(this.projectConfig.dataRoot),
       assets: Ninja.ninjaPath(this.projectConfig.assetsRoot),
     };
+    this.configNames = this.args?.configurations || [];
+    this.isServer = this.args?.server || false;
     this.webpackConfigBuilder = new WebpackConfigBuilder(this);
+
+    // TODO: Add configuration Validation for project
+    //  should check is provided project is defined...
   }
 
   static log(...args: any[]) {
@@ -47,15 +43,24 @@ export class Ninja {
     console.log('NINJA FAILED!', ...args);
   }
 
-  static ninjaPath(relativePath: string): string {
-    return resolve(process.cwd(), relativePath);
+  static fatalError(...args: any[]) {
+    Ninja.error(...args);
+    process.exit(1);
+  }
+
+  static ninjaPath(...relativePaths: string[]): string {
+    return resolve(process.cwd(), join(...relativePaths));
+  }
+
+  static loadConfig(): NinjaConfigurationInterface {
+    return require(Ninja.ninjaPath('ninja.config.json'));
   }
 
   getLocales() {
     return Object.keys(this.projectConfig?.i18n?.locales || {});
   }
 
-  getBuildConfiguration(): NinjaBuildConfiguration | undefined {
+  getBuildConfiguration(): NinjaBuildConfiguration {
     const defaultConfig: NinjaBuildConfiguration = {
       server: false,
       ...this.projectConfig.architect.build.options,
@@ -82,7 +87,12 @@ export class Ninja {
       };
     }, fullConfig);
 
-    return this.addLocalizationsToConfig(fullConfig);
+    const config = this.addLocalizationsToConfig(fullConfig);
+    if (!config) {
+      Ninja.error('No configuration. Aborting.');
+      process.exit(0);
+    }
+    return config;
   }
 
   /**
@@ -104,18 +114,20 @@ export class Ninja {
   }
 
   serve() {
-    const config = this.webpackConfigBuilder.createConfig(this.buildConfiguration);
+    const buildConfiguration: NinjaBuildConfiguration = this.getBuildConfiguration();
+    const config = this.webpackConfigBuilder.createConfig(buildConfiguration);
     runServer(config);
   }
 
   build() {
+    const buildConfiguration: NinjaBuildConfiguration = this.getBuildConfiguration();
     if (this.locales.length) {
       this.locales.forEach((locale) => {
-        const config = this.webpackConfigBuilder.createConfig(this.buildConfiguration, locale);
+        const config = this.webpackConfigBuilder.createConfig(buildConfiguration, locale);
         this.runBuild(config);
       });
     } else {
-      const config = this.webpackConfigBuilder.createConfig(this.buildConfiguration);
+      const config = this.webpackConfigBuilder.createConfig(buildConfiguration);
       this.runBuild(config);
     }
   }
