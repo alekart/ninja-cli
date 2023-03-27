@@ -128,8 +128,10 @@ export class WebpackConfigBuilder {
                       configurations: this.ninja.configNames,
                       environment: this.loadEnv(),
                     },
-                    env: require(Ninja.ninjaPath('src/data/_env.json')).acc,
                   },
+                  globals: this.getNunjucksConfigurationFor('globals'),
+                  extensions: this.getNunjucksConfigurationFor('extensions'),
+                  filters: this.getNunjucksConfigurationFor('filters'),
                   nunjucks: {
                     trimBlocks: true,
                     throwOnUndefined: true,
@@ -190,5 +192,15 @@ export class WebpackConfigBuilder {
     }
 
     return config;
+  }
+
+  private getNunjucksConfigurationFor(type: 'globals' | 'filters' | 'extensions') {
+    const fns = this.ninja.config.nunjucks?.[type] || {};
+    const names = Object.keys(fns);
+    return names.reduce((accum, name) => {
+      const path = Ninja.ninjaPath(fns[name]);
+      accum[name] = path;
+      return accum;
+    }, {} as Record<string, string>)
   }
 }
