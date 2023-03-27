@@ -17,12 +17,11 @@
       },
       "architect": {
         "build": {
+          "builder": "builder:build",
           "options": {
             "locale": "fr",
             "outputPath": "dist/",
-            "index": "src/templates/index.njk",
-            "main": "src/index.ts",
-            "aot": true
+            "main": "src/index.ts"
           },
           "configurations": {
             "production": {
@@ -33,9 +32,7 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "none",
-              "sourceMap": true,
-              "namedChunks": false
+              "sourceMap": true
             },
             "en": {
               "localize": [
@@ -49,8 +46,8 @@
           }
         },
         "serve": {
+          "builder": "builder:dev-server",
           "options": {
-            "optimization": false,
             "port": 4000,
             "historyApiFallback": {
               "rewrites": [
@@ -68,6 +65,12 @@
                 }
               ]
             }
+          }
+        },
+        "i18n-extract": {
+          "builder": "builder:i18n",
+          "options": {
+            "outputPath": "locales"
           }
         }
       }
