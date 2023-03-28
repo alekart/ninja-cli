@@ -1,6 +1,6 @@
 {
   "name": "@alekart/ninja-cli",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-alpha.2",
   "description": "Webpack based static HTML/CSS/JS CLI builder",
   "directories": {
     "doc": "docs"
@@ -40,6 +40,7 @@
   "dependencies": {
     "@alekart/nunjucks-html-loader": "^1.0.0-beta.3",
     "babel-loader": "^9.1.2",
+    "babel-plugin-lodash": "^3.3.4",
     "command-exists": "^1.2.9",
     "css-loader": "^6.7.3",
     "gettext-extractor": "^3.6.2",
@@ -75,6 +76,7 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
+    "rxjs": "^7.8.0",
     "typescript": "^4.9.5"
   }
 }
