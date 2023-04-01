@@ -1,0 +1,82 @@
+{
+  "$schema": "./schema.json",
+  "version": 1,
+  "nunjucks": {
+  },
+  "projects": {
+    "projectName": {
+      "root": "",
+      "sourceRoot": "src",
+      "templatesRoot": "src/templates",
+      "assetsRoot": "src/assets",
+      "dataRoot": "src/data",
+      "i18n": {
+        "sourceLocale": "fr",
+        "outputPath": "src/locales/",
+        "locales": {
+          "en": "src/locale/messages.en-US.xlf"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "builder:build",
+          "options": {
+            "locale": "fr",
+            "outputPath": "dist/",
+            "main": "src/index.ts"
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "sourceMap": true
+            },
+            "en": {
+              "localize": [
+                "en"
+              ]
+            },
+            "fr": {
+              "baseHref": "/",
+              "outputPath": "dist/fr"
+            }
+          }
+        },
+        "serve": {
+          "builder": "builder:dev-server",
+          "options": {
+            "port": 4000,
+            "historyApiFallback": {
+              "rewrites": [
+                {
+                  "from": "/^\/$/",
+                  "to": "/views/landing.html"
+                },
+                {
+                  "from": "/^\/subpage/",
+                  "to": "/views/subpage.html"
+                },
+                {
+                  "from": "/./",
+                  "to": "/views/404.html"
+                }
+              ]
+            }
+          }
+        },
+        "i18n-extract": {
+          "builder": "builder:i18n",
+          "options": {
+            "outputPath": "locales"
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "projectName"
+}

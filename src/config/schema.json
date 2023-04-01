@@ -1,0 +1,747 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ninja-cli://config/schema.json",
+  "title": "Ninja CLI Configuration",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "$ref": "#/definitions/fileVersion"
+    },
+    "newProjectRoot": {
+      "type": "string",
+      "description": "Path where new projects will be created."
+    },
+    "defaultProject": {
+      "type": "string",
+      "description": "Default project name used in commands."
+    },
+    "nunjucks": {
+      "$ref": "#/definitions/NunjucksConfigurationSchema"
+    },
+    "projects": {
+      "type": "object",
+      "patternProperties": {
+        "^(?:@[a-zA-Z0-9_-]+/)?[a-zA-Z0-9_-]+$": {
+          "$ref": "#/definitions/project"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "definitions": {
+    "fileVersion": {
+      "type": "integer",
+      "description": "File format version",
+      "minimum": 1
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "root": {
+          "type": "string",
+          "description": "Root of the project files."
+        },
+        "i18n": {
+          "$ref": "#/definitions/project/definitions/i18n"
+        },
+        "sourceRoot": {
+          "type": "string",
+          "description": "The root of the source files, assets and index.html file structure."
+        },
+        "templatesRoot": {
+          "type": "string",
+          "description": "The root of the nunjucks templates files."
+        },
+        "dataRoot": {
+          "type": "string",
+          "description": "The root of the data .json files to load into nunjucks environment."
+        },
+        "assetsRoot": {
+          "type": "string",
+          "description": "The root of the assets files, to watch changes."
+        },
+        "architect": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/project/definitions/target"
+          }
+        }
+      },
+      "required": [
+        "root",
+        "sourceRoot",
+        "templatesRoot",
+        "assetsRoot"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "architect"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z]{1,3}-.*": {}
+      },
+      "definitions": {
+        "i18n": {
+          "description": "Project i18n options",
+          "type": "object",
+          "properties": {
+            "sourceLocale": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "Specifies the source locale of the application.",
+                  "default": "en-US",
+                  "$comment": "IETF BCP 47 language tag (simplified)",
+                  "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+                },
+                {
+                  "type": "object",
+                  "description": "Localization options to use for the source locale",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Specifies the locale code of the source locale",
+                      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+                    },
+                    "baseHref": {
+                      "type": "string",
+                      "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "outputPath": {
+              "type": "string",
+              "description": "Destination of extraction of i18n files.",
+              "default": "locales"
+            },
+            "locales": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Localization file to use for i18n"
+                    },
+                    {
+                      "type": "array",
+                      "description": "Localization files to use for i18n",
+                      "items": {
+                        "type": "string",
+                        "uniqueItems": true
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "description": "Localization options to use for the locale",
+                      "properties": {
+                        "translation": {
+                          "oneOf": [
+                            {
+                              "type": "string",
+                              "description": "Localization file to use for i18n"
+                            },
+                            {
+                              "type": "array",
+                              "description": "Localization files to use for i18n",
+                              "items": {
+                                "type": "string",
+                                "uniqueItems": true
+                              }
+                            }
+                          ]
+                        },
+                        "baseHref": {
+                          "type": "string",
+                          "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "outputPath"
+          ]
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "builder:build"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "#/definitions/NinjaBuilderConfigurationSchema"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/NinjaBuilderConfigurationSchema"
+                  }
+                }
+              },
+              "required": [
+                "builder"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "builder:dev-server"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "#/definitions/NinjaServerConfigurationSchema"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/NinjaServerConfigurationSchema"
+                  }
+                }
+              },
+              "required": [
+                "builder"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "builder:i18n"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "#/definitions/NinjaI18nExtractSchema"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/NinjaI18nExtractSchema"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "global": {
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "format": "uri"
+        },
+        "version": {
+          "$ref": "#/definitions/fileVersion"
+        },
+        "cli": {
+          "$ref": "#/definitions/cliOptions"
+        },
+        "schematics": {
+          "$ref": "#/definitions/schematicOptions"
+        }
+      },
+      "required": [
+        "version"
+      ]
+    },
+    "NinjaBuilderConfigurationSchema": {
+      "title": "Webpack browser schema for Build Facade.",
+      "description": "Browser target options",
+      "type": "object",
+      "properties": {
+        "assets": {
+          "type": "array",
+          "description": "TODO! List of static application assets.",
+          "default": [],
+          "items": {
+            "$ref": "#/definitions/NinjaBuilderConfigurationSchema/definitions/assetPattern"
+          }
+        },
+        "main": {
+          "type": "string",
+          "description": "The full path for the main entry point to the app, relative to the current workspace."
+        },
+        "locale": {
+          "type": "string",
+          "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+        },
+        "tsConfig": {
+          "type": "string",
+          "description": "TODO! The full path for the TypeScript configuration file, relative to the current workspace."
+        },
+        "styles": {
+          "description": "Global styles to be included in the build.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "string",
+                    "description": "The file to include.",
+                    "pattern": "\\.(?:css|scss|sass|less)$"
+                  },
+                  "bundleName": {
+                    "type": "string",
+                    "pattern": "^[\\w\\-.]*$",
+                    "description": "The bundle name for this extra entry point."
+                  },
+                  "inject": {
+                    "type": "boolean",
+                    "description": "If the bundle will be referenced in the HTML file.",
+                    "default": true
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "string",
+                "description": "The file to include.",
+                "pattern": "\\.(?:css|scss|sass|less)$"
+              }
+            ]
+          }
+        },
+        "stylePreprocessorOptions": {
+          "description": "Options to pass to style preprocessors.",
+          "type": "object",
+          "properties": {
+            "includePaths": {
+              "description": "TODO! Paths to include. Paths will be resolved to workspace root.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": []
+            }
+          },
+          "additionalProperties": false
+        },
+        "optimization": {
+          "description": "Enables optimization of the build output. Including minification of scripts and styles, tree-shaking, dead-code elimination.",
+          "default": true,
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "scripts": {
+                  "type": "boolean",
+                  "description": "Enables optimization of the scripts output.",
+                  "default": true
+                },
+                "styles": {
+                  "description": "Enables optimization of the styles output.",
+                  "default": true,
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minify": {
+                          "type": "boolean",
+                          "description": "Minify CSS definitions by removing extraneous whitespace and comments, merging identifiers and minimizing values.",
+                          "default": true
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "fileReplacements": {
+          "description": "Replace compilation source files with other compilation source files in the build.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NinjaBuilderConfigurationSchema/definitions/fileReplacement"
+          },
+          "default": []
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "The full path for the new output directory, relative to the current workspace.\nBy default, writes output to a folder named dist/ in the current project."
+        },
+        "sourceMap": {
+          "type": "boolean",
+          "description": "Output source maps for scripts and styles.",
+          "default": false
+        },
+        "vendorChunk": {
+          "type": "boolean",
+          "description": "TODO! Generate a seperate bundle containing only vendor libraries. This option should only be used for development to reduce the incremental compilation time.",
+          "default": false
+        },
+        "commonChunk": {
+          "type": "boolean",
+          "description": "TODO! Generate a seperate bundle containing code used across multiple bundles.",
+          "default": true
+        },
+        "baseHref": {
+          "type": "string",
+          "description": "TODO! Base url for the application being built."
+        },
+        "i18nMissingTranslation": {
+          "type": "string",
+          "description": "TODO! How to handle missing translations for i18n.",
+          "enum": [
+            "warning",
+            "error",
+            "ignore"
+          ],
+          "default": "warning"
+        },
+        "i18nDuplicateTranslation": {
+          "type": "string",
+          "description": "TODO! How to handle duplicate translations for i18n.",
+          "enum": [
+            "warning",
+            "error",
+            "ignore"
+          ],
+          "default": "warning"
+        },
+        "localize": {
+          "description": "Translate the bundles in one or more locales.",
+          "oneOf": [
+            {
+              "type": "boolean",
+              "description": "Translate all locales."
+            },
+            {
+              "type": "array",
+              "description": "List of locales ID's to translate.",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
+              }
+            }
+          ]
+        },
+        "outputHashing": {
+          "type": "string",
+          "description": "Define the output filename cache-busting hashing mode.",
+          "default": "none",
+          "enum": [
+            "none",
+            "all",
+            "media",
+            "bundles"
+          ]
+        },
+        "extractLicenses": {
+          "type": "boolean",
+          "description": "Extract all licenses in a separate file.",
+          "default": true
+        },
+        "namedChunks": {
+          "type": "boolean",
+          "description": "Use file name for lazy loaded chunks.",
+          "default": false
+        },
+        "statsJson": {
+          "type": "boolean",
+          "description": "TODO! Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
+          "default": false
+        }
+      },
+      "additionalProperties": false,
+      "definitions": {
+        "assetPattern": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "followSymlinks": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Allow glob patterns to follow symlink directories. This allows subdirectories of the symlink to be searched."
+                },
+                "glob": {
+                  "type": "string",
+                  "description": "The pattern to match."
+                },
+                "input": {
+                  "type": "string",
+                  "description": "The input directory path in which to apply 'glob'. Defaults to the project root."
+                },
+                "ignore": {
+                  "description": "An array of globs to ignore.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "output": {
+                  "type": "string",
+                  "description": "Absolute path within the output."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "fileReplacement": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "src": {
+                  "type": "string",
+                  "pattern": "\\.(([cm]?j|t)sx?|json)$"
+                },
+                "replaceWith": {
+                  "type": "string",
+                  "pattern": "\\.(([cm]?j|t)sx?|json)$"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "replace": {
+                  "type": "string",
+                  "pattern": "\\.(([cm]?j|t)sx?|json)$"
+                },
+                "with": {
+                  "type": "string",
+                  "pattern": "\\.(([cm]?j|t)sx?|json)$"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "NinjaServerConfigurationSchema": {
+      "title": "Dev Server Target",
+      "description": "Dev Server target options for Build Facade.",
+      "type": "object",
+      "properties": {
+        "browserTarget": {
+          "type": "string",
+          "description": "A browser builder target to serve in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`.",
+          "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+        },
+        "port": {
+          "type": "number",
+          "description": "Port to listen on.",
+          "default": 4000
+        },
+        "host": {
+          "type": "string",
+          "description": "TODO! Host to listen on.",
+          "default": "localhost"
+        },
+        "proxyConfig": {
+          "type": "string",
+          "description": "TODO! Proxy configuration file."
+        },
+        "ssl": {
+          "type": "boolean",
+          "description": "TODO! Serve using HTTPS.",
+          "default": false
+        },
+        "sslKey": {
+          "type": "string",
+          "description": "TODO! SSL key to use for serving HTTPS."
+        },
+        "sslCert": {
+          "type": "string",
+          "description": "TODO! SSL certificate to use for serving HTTPS."
+        },
+        "headers": {
+          "type": "object",
+          "description": "TODO! Custom HTTP headers to be added to all responses.",
+          "propertyNames": {
+            "pattern": "^[-_A-Za-z0-9]+$"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "historyApiFallback": {
+          "type": "object",
+          "properties": {
+            "rewrites": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              }
+            }
+          }
+        },
+        "open": {
+          "type": "boolean",
+          "description": "TODO! Opens the url in default browser.",
+          "default": false,
+          "alias": "o"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NinjaI18nExtractSchema": {
+      "title": "Extract i18n Target",
+      "description": "Extract i18n target options for Build Facade.",
+      "type": "object",
+      "properties": {
+        "builder": {
+          "const": "builder:i18n"
+        },
+        "outputPath": {
+          "type": "string",
+          "description": "Path where output will be placed."
+        },
+        "i18nMissingTranslation": {
+          "type": "string",
+          "description": "How to handle missing translations for i18n.",
+          "enum": [
+            "warning",
+            "error",
+            "ignore"
+          ],
+          "default": "warning"
+        },
+        "i18nDuplicateTranslation": {
+          "type": "string",
+          "description": "How to handle duplicate translations for i18n.",
+          "enum": [
+            "warning",
+            "error",
+            "ignore"
+          ],
+          "default": "warning"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NunjucksConfigurationSchema": {
+      "type": "object",
+      "properties": {
+        "autoescape": {
+          "type": "boolean"
+        },
+        "throwOnUndefined": {
+          "type": "boolean"
+        },
+        "trimBlocks": {
+          "type": "boolean"
+        },
+        "lstripBlocks": {
+          "type": "boolean"
+        },
+        "tags": {
+          "type": "object",
+          "properties": {
+            "blockStart": {
+              "type": "string"
+            },
+            "blockEnd": {
+              "type": "string"
+            },
+            "variableStart": {
+              "type": "string"
+            },
+            "variableEnd": {
+              "type": "string"
+            },
+            "commentStart": {
+              "type": "string"
+            },
+            "commentEnd": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "globals": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "filters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
